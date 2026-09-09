@@ -476,7 +476,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "cleanup-chore-assist"
+name = "cleanup-assist"
 version = "0.1.0"
 dependencies = [
  "scanner-core",

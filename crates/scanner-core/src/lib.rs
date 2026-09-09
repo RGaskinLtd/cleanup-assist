@@ -1,4 +1,4 @@
-//! Core engine for Cleanup Chore Assist.
+//! Core engine for Cleanup Assist.
 //!
 //! Pipeline: `scan` walks the filesystem and aggregates sizes, `classify`
 //! assigns each large directory a safety tier, `staleness` (Phase 3) will

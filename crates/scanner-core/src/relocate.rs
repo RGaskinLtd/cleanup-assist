@@ -101,7 +101,7 @@ pub enum RelocateError {
         path: String,
         source: std::io::Error,
     },
-    #[error("this folder contains Cleanup Chore Assist's own {0} — the app can't move the folder it is running from")]
+    #[error("this folder contains Cleanup Assist's own {0} — the app can't move the folder it is running from")]
     SourceContainsSelf(&'static str),
     #[error("files in this folder are in use — close programs using it (and any Explorer windows open on it), then try again. Windows reported: {0}")]
     FolderInUse(std::io::Error),
@@ -238,7 +238,7 @@ fn contains_self(src: &Path) -> Option<&'static str> {
     // app's own browser-engine data while it runs.
     let webview_data = std::env::var("LOCALAPPDATA")
         .ok()
-        .map(|d| Path::new(&d).join("com.richardgaskin.cleanupchoreassist"));
+        .map(|d| Path::new(&d).join("com.richardgaskin.cleanupassist"));
     let candidates: [(&'static str, Option<std::path::PathBuf>); 3] = [
         ("executable", std::env::current_exe().ok()),
         ("working directory", std::env::current_dir().ok()),

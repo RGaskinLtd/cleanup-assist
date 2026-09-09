@@ -219,7 +219,7 @@ function App() {
   return (
     <main className="app">
       <header className="header">
-        <h1>Cleanup Chore Assist</h1>
+        <h1>Cleanup Assist</h1>
         <p className="tagline">
           Where your disk space went — and whether it's safe to take back
         </p>

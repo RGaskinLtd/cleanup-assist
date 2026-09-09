@@ -2,7 +2,7 @@
 name = "scanner-core"
 version = "0.1.0"
 edition = "2021"
-description = "Disk scanning, classification, and staleness engine for Cleanup Chore Assist"
+description = "Disk scanning, classification, and staleness engine for Cleanup Assist"
 
 [dependencies]
 jwalk = "0.8"

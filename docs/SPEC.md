@@ -1,4 +1,4 @@
-# Cleanup Chore Assist — Spec
+# Cleanup Assist — Spec
 
 ## Problem
 
