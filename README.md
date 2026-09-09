@@ -8,7 +8,7 @@
 
 *A Windows 11 disk analyzer that answers the question every other one leaves you with.*
 
-<a href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest"><img src="https://img.shields.io/github/v/release/RGaskinLtd/cleanup-assist?label=download%20latest&color=34d399&style=for-the-badge" alt="Download the latest release" /></a>
+<a href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest"><img src="https://img.shields.io/badge/download-latest%20release-34d399?style=for-the-badge" alt="Download the latest release" /></a>
 
 <img src="public/screenshot.png" alt="Cleanup Assist scanning a Desktop folder, with every large directory badged as reclaimable or personal files" width="850" />
 
