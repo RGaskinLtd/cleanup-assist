@@ -1,0 +1,54 @@
+# Builds Cleanup Assist and publishes a GitHub release whenever a version tag
+# is pushed. Releasing v0.2.0 is just:
+#
+#   git tag v0.2.0
+#   git push --tags
+#
+# The release appears with the NSIS installer, the MSI, and the portable exe
+# attached. Remember to bump `version` in src-tauri/tauri.conf.json,
+# src-tauri/Cargo.toml, and package.json first so the artifacts are named
+# consistently.
+
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write # create the release and upload assets
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: swatinem/rust-cache@v2
+
+      - run: npm ci
+
+      # Builds the app (runs the frontend build via beforeBuildCommand),
+      # creates the release for this tag, and uploads the NSIS + MSI bundles.
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Cleanup Assist ${{ github.ref_name }}"
+          releaseBody: "See the assets below. The `-setup.exe` is the recommended download; `cleanup-assist.exe` is portable."
+          releaseDraft: false
+          prerelease: false
+
+      # tauri-action uploads the installers; add the portable exe alongside.
+      - name: Attach portable exe
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ github.ref_name }} "target/release/cleanup-assist.exe" --clobber
