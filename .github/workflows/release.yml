@@ -72,7 +72,8 @@ jobs:
           gh release upload $tag SHA256SUMS.txt --clobber
 
           # Build the notes in a file: multi-line args to native exes are fragile.
-          $fence = [char]96 * 3
+          # Single quotes keep the backticks literal rather than escaping.
+          $fence = '```'
           $notes = @(
             "Download the setup.exe (recommended), the .msi for scripted installs,"
             "or cleanup-assist.exe to run it portable."
