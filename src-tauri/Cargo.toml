@@ -1,6 +1,6 @@
 [package]
 name = "cleanup-assist"
-version = "0.2.0"
+version = "0.2.1"
 description = "Find what's eating your disk — and whether it's safe to reclaim"
 authors = ["Richard Gaskin"]
 edition = "2021"
