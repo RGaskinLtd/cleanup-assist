@@ -1,0 +1,16 @@
+[package]
+name = "scanner-core"
+version = "0.1.0"
+edition = "2021"
+description = "Disk scanning, classification, and staleness engine for Cleanup Chore Assist"
+
+[dependencies]
+jwalk = "0.8"
+globset = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+winreg = "0.55"
+junction = "1"
+fs2 = "0.4"
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Storage_FileSystem"] }
