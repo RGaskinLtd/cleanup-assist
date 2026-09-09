@@ -52,6 +52,17 @@ make a chore feel less like one.
 **[latest release](https://github.com/RGaskinLtd/cleanup-assist/releases/latest)** —
 or the portable `cleanup-assist.exe` if you'd rather skip installing.
 
+### "Windows protected your PC"
+
+You'll see a blue SmartScreen dialog naming an *unknown publisher*. That's expected:
+these builds aren't code-signed, and Windows distrusts any installer it hasn't seen
+before. To continue, click **More info → Run anyway**.
+
+If you'd rather verify before trusting it: every release lists SHA-256 checksums,
+the binaries are built in public by
+[GitHub Actions](.github/workflows/release.yml) straight from this repo — never
+uploaded from anyone's machine — and the whole source is here to read.
+
 **Building from source?** Prerequisites: [Node 20+](https://nodejs.org),
 [Rust (stable, MSVC)](https://rustup.rs), Windows 11 (WebView2 ships with it).
 

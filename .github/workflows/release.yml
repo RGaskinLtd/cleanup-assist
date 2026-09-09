@@ -52,3 +52,40 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.ref_name }} "target/release/cleanup-assist.exe" --clobber
+
+      # The builds are unsigned, so publish checksums people can verify against.
+      - name: Publish checksums
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $files = @(
+            Get-ChildItem "target/release/bundle/nsis/*-setup.exe"
+            Get-ChildItem "target/release/bundle/msi/*.msi"
+            Get-ChildItem "target/release/cleanup-assist.exe"
+          )
+          $lines = $files | ForEach-Object {
+            "$((Get-FileHash $_ -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
+          }
+          $lines | Out-File -Encoding ascii SHA256SUMS.txt
+          gh release upload $tag SHA256SUMS.txt --clobber
+
+          # Build the notes in a file: multi-line args to native exes are fragile.
+          $fence = [char]96 * 3
+          $notes = @(
+            "Download the setup.exe (recommended), the .msi for scripted installs,"
+            "or cleanup-assist.exe to run it portable."
+            ""
+            "Windows will warn that the publisher is unknown - these builds are"
+            "unsigned. Click **More info -> Run anyway**, or verify the download"
+            "against the checksums below."
+            ""
+            "### SHA-256"
+            ""
+            $fence
+            $lines
+            $fence
+          )
+          $notes | Out-File -Encoding utf8 release-notes.md
+          gh release edit $tag --notes-file release-notes.md
