@@ -8,7 +8,7 @@
 
 *A Windows 11 disk analyzer that answers the question every other one leaves you with.*
 
-<a href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest"><img src="https://img.shields.io/badge/download-latest%20release-34d399?style=for-the-badge" alt="Download the latest release" /></a>
+<a href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest"><img src="https://img.shields.io/github/v/release/RGaskinLtd/cleanup-assist?label=download%20latest&color=34d399&style=for-the-badge" alt="Download the latest release" /></a>
 
 <img src="public/screenshot.png" alt="Cleanup Assist scanning a Desktop folder, with every large directory badged as reclaimable or personal files" width="850" />
 
@@ -106,3 +106,10 @@ See [docs/SPEC.md](docs/SPEC.md) for the full design.
 
 No auto-deletion, ever. No touching OS-managed paths. No telemetry — your file
 system is your business.
+
+## License
+
+[PolyForm Internal Use 1.0.0](LICENSE.md) — you're welcome to use the app and
+read, build, and modify the source for yourself or your company. Distributing
+the software or your changes (as-is, rebranded, or otherwise) isn't permitted;
+official builds come from [Releases](https://github.com/RGaskinLtd/cleanup-assist/releases).
