@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Cleanup Assist scans your Windows 11 drive and tells you which large folders are safe to reclaim - Windows system, installed app, cache, or your own files.">
+<link rel="icon" href="src-tauri/icons/32x32.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Cleanup Assist">
+<meta property="og:description" content="Every disk tool shows what's big. This one shows what's safe.">
+<meta property="og:image" content="https://raw.githubusercontent.com/RGaskinLtd/cleanup-assist/main/public/screenshot.png">
+<meta name="twitter:card" content="summary_large_image">
+<title>Cleanup Assist</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    color-scheme: light;
+    --ground: #eceff3;
+    --surface: #ffffff;
+    --surface-2: #f5f8fa;
+    --line: #d6dde5;
+    --line-soft: #e5eaf0;
+    --ink: #141820;
+    --ink-2: #58616f;
+    --ink-3: #8791a0;
+    --accent: #0d9668;
+    --accent-ink: #ffffff;
+    --tier-os: #66707e;
+    --tier-app: #2563eb;
+    --tier-reclaim: #0d9668;
+    --tier-user: #bf2bd0;
+    --tier-unknown: #6d3ae0;
+    --shadow: 0 1px 2px rgba(20, 24, 32, .06), 0 12px 32px -12px rgba(20, 24, 32, .18);
+
+    --step-0: 1rem;
+    --step-1: 1.15rem;
+    --step-2: 1.45rem;
+    --step-3: 2rem;
+    --step-4: clamp(2.4rem, 5.2vw, 3.9rem);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #101318;
+      --surface: #181c23;
+      --surface-2: #1f242c;
+      --line: #2b313a;
+      --line-soft: #232830;
+      --ink: #e9ecf1;
+      --ink-2: #9ba5b3;
+      --ink-3: #6d7885;
+      --accent: #34d399;
+      --accent-ink: #062b20;
+      --tier-os: #8b95a3;
+      --tier-app: #60a5fa;
+      --tier-reclaim: #34d399;
+      --tier-user: #e879f9;
+      --tier-unknown: #a78bfa;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 16px 40px -16px rgba(0, 0, 0, .7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #101318;
+    --surface: #181c23;
+    --surface-2: #1f242c;
+    --line: #2b313a;
+    --line-soft: #232830;
+    --ink: #e9ecf1;
+    --ink-2: #9ba5b3;
+    --ink-3: #6d7885;
+    --accent: #34d399;
+    --accent-ink: #062b20;
+    --tier-os: #8b95a3;
+    --tier-app: #60a5fa;
+    --tier-reclaim: #34d399;
+    --tier-user: #e879f9;
+    --tier-unknown: #a78bfa;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 16px 40px -16px rgba(0, 0, 0, .7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size: var(--step-0);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  h1, h2, h3 {
+    font-family: Archivo, ui-sans-serif, system-ui, sans-serif;
+    text-wrap: balance;
+    margin: 0;
+    letter-spacing: -0.022em;
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  /* ---------- masthead ---------- */
+
+  .masthead {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.4rem 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-family: Archivo, sans-serif;
+    font-weight: 700;
+    font-size: 1.02rem;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+  }
+
+  .mark {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at center, var(--ground) 0 34%, transparent 34.5%),
+      conic-gradient(var(--tier-reclaim) 0 140deg, var(--tier-app) 140deg 230deg,
+                     var(--tier-unknown) 230deg 290deg, var(--tier-os) 290deg 360deg);
+    flex: none;
+  }
+
+  .masthead nav {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 1.4rem;
+    font-size: .92rem;
+  }
+
+  .masthead nav a {
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+
+  .masthead nav a:hover { color: var(--ink); }
+
+  /* ---------- hero ---------- */
+
+  .hero {
+    padding: 4.2rem 0 2.6rem;
+    display: grid;
+    gap: 1.5rem;
+    justify-items: start;
+  }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .74rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    font-weight: 800;
+    line-height: 1.03;
+    max-width: 17ch;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .lede {
+    font-size: var(--step-1);
+    color: var(--ink-2);
+    max-width: 56ch;
+    margin: 0;
+  }
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .8rem;
+    margin-top: .3rem;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .78rem 1.3rem;
+    border-radius: 7px;
+    font-weight: 600;
+    font-size: .96rem;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: transform .12s ease, background-color .12s ease, border-color .12s ease;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); }
+
+  .btn-ghost {
+    border-color: var(--line);
+    color: var(--ink);
+    background: var(--surface);
+  }
+
+  .btn-ghost:hover { border-color: var(--ink-3); }
+
+  .fineprint {
+    font-size: .85rem;
+    color: var(--ink-3);
+  }
+
+  /* ---------- scan panel ---------- */
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1.4rem;
+    flex-wrap: wrap;
+    padding: .9rem 1.1rem;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--surface-2);
+  }
+
+  .panel-head .path {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .85rem;
+    color: var(--ink-2);
+  }
+
+  .panel-head .totals {
+    margin-left: auto;
+    font-size: .82rem;
+    color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rows { display: flex; flex-direction: column; }
+
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 1rem;
+    padding: .72rem 1.1rem;
+    border-top: 1px solid var(--line-soft);
+    font-size: .875rem;
+  }
+
+  .row:first-child { border-top: none; }
+
+  .row .fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: currentColor;
+    opacity: .09;
+    pointer-events: none;
+    animation: sweep .75s cubic-bezier(.22, .8, .3, 1) both;
+  }
+
+  @keyframes sweep {
+    from { width: 0 !important; }
+  }
+
+  .row .p {
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--ink);
+    z-index: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .row .size {
+    z-index: 1;
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    min-width: 4.6em;
+    text-align: right;
+  }
+
+  .badge {
+    z-index: 1;
+    font-size: .705rem;
+    font-weight: 600;
+    letter-spacing: .01em;
+    padding: .14rem .55rem;
+    border-radius: 999px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+  }
+
+  .t-reclaim { color: var(--tier-reclaim); }
+  .t-app     { color: var(--tier-app); }
+  .t-user    { color: var(--tier-user); }
+  .t-os      { color: var(--tier-os); }
+  .t-unknown { color: var(--tier-unknown); }
+
+  .panel-foot {
+    padding: .75rem 1.1rem;
+    border-top: 1px solid var(--line-soft);
+    background: var(--surface-2);
+    font-size: .82rem;
+    color: var(--ink-3);
+  }
+
+  /* ---------- sections ---------- */
+
+  section { padding: 2.9rem 0; }
+
+  .section-label {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .74rem;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 1.6rem;
+  }
+
+  h2 {
+    font-size: var(--step-3);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: .7rem;
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2.2rem 2.6rem;
+  }
+
+  .feature h3 {
+    font-size: var(--step-1);
+    font-weight: 700;
+    margin-bottom: .45rem;
+  }
+
+  .feature p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: .93rem;
+  }
+
+  .feature .rule {
+    width: 34px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--accent);
+    margin-bottom: .9rem;
+  }
+
+  .feature:nth-child(2) .rule { background: var(--tier-app); }
+  .feature:nth-child(3) .rule { background: var(--tier-user); }
+
+  /* ---------- move callout ---------- */
+
+  .callout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, .85fr);
+    gap: 2.4rem;
+    align-items: center;
+    padding: 2.2rem;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+
+  .callout p {
+    color: var(--ink-2);
+    margin: 0;
+  }
+
+  .link-demo {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: .82rem;
+    display: grid;
+    gap: .55rem;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 9px;
+    padding: 1rem;
+    overflow-x: auto;
+  }
+
+  .link-demo .lbl {
+    font-family: "IBM Plex Sans", sans-serif;
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .link-demo .arrow { color: var(--accent); }
+
+  /* ---------- download ---------- */
+
+  .download {
+    text-align: center;
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+  }
+
+  .download h2 { max-width: 18ch; }
+
+  .warn {
+    max-width: 60ch;
+    font-size: .88rem;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--tier-app);
+    border-radius: 8px;
+    padding: .85rem 1.1rem;
+    text-align: left;
+  }
+
+  .warn strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- coffee ---------- */
+
+  .coffee {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.6rem 1.8rem;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+
+  .coffee p {
+    margin: 0;
+    color: var(--ink-2);
+    font-size: .95rem;
+    flex: 1 1 260px;
+  }
+
+  .coffee strong { color: var(--ink); font-weight: 600; }
+
+  footer {
+    border-top: 1px solid var(--line-soft);
+    padding: 2rem 0 3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem 1.6rem;
+    font-size: .85rem;
+    color: var(--ink-3);
+  }
+
+  footer a { color: var(--ink-2); text-decoration: none; }
+  footer a:hover { color: var(--ink); }
+  footer .spacer { margin-left: auto; }
+
+  @media (max-width: 720px) {
+    .callout { grid-template-columns: 1fr; }
+    .row { grid-template-columns: 1fr auto; row-gap: .4rem; }
+    .row .badge { grid-column: 1; justify-self: start; }
+    .masthead nav a.hide-sm { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span> Cleanup Assist</a>
+    <nav>
+      <a class="hide-sm" href="https://github.com/RGaskinLtd/cleanup-assist">Source</a>
+      <a class="hide-sm" href="https://buymeacoffee.com/richard_gaskin">Buy me a coffee</a>
+      <a href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest">Download</a>
+    </nav>
+  </header>
+
+  <div class="hero" id="top">
+    <p class="eyebrow">Windows 11 &middot; source available</p>
+    <h1>Every disk tool shows what's big. This one shows what's <em>safe</em>.</h1>
+    <p class="lede">
+      Cleanup Assist scans a drive and gives every large folder a verdict — part of Windows,
+      owned by an installed app, a cache you can bin, or your own files. No more staring at a
+      30&nbsp;GB folder wondering whether deleting it frees your drive or breaks your PC.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest">Download for Windows 11</a>
+      <a class="btn btn-ghost" href="https://github.com/RGaskinLtd/cleanup-assist">Read the source</a>
+    </div>
+    <p class="fineprint">Free &middot; no account &middot; no telemetry &middot; nothing is ever deleted without you saying so</p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <span class="path">C:\</span>
+      <span class="totals">476 GB scanned &middot; 1,284,903 files &middot; 41.2s</span>
+    </div>
+    <div class="rows">
+      <div class="row t-reclaim">
+        <span class="fill" style="width:100%"></span>
+        <span class="p">C:\Users\richard\AppData\Local\Docker\wsl</span>
+        <span class="badge">Reclaimable &middot; docker-wsl-disk</span>
+        <span class="size">24.8 GB</span>
+      </div>
+      <div class="row t-user">
+        <span class="fill" style="width:50%; animation-delay:.06s"></span>
+        <span class="p">C:\Users\richard\Pictures</span>
+        <span class="badge">Your files</span>
+        <span class="size">12.4 GB</span>
+      </div>
+      <div class="row t-reclaim">
+        <span class="fill" style="width:37%; animation-delay:.12s"></span>
+        <span class="p">C:\Windows.old</span>
+        <span class="badge">Reclaimable &middot; windows-old</span>
+        <span class="size">9.1 GB</span>
+      </div>
+      <div class="row t-app">
+        <span class="fill" style="width:19%; animation-delay:.18s"></span>
+        <span class="p">C:\Program Files\Blender Foundation\Blender 4.1</span>
+        <span class="badge">Installed app &middot; Blender</span>
+        <span class="size">4.6 GB</span>
+      </div>
+      <div class="row t-os">
+        <span class="fill" style="width:16%; animation-delay:.24s"></span>
+        <span class="p">C:\Windows\System32</span>
+        <span class="badge">OS</span>
+        <span class="size">3.9 GB</span>
+      </div>
+      <div class="row t-unknown">
+        <span class="fill" style="width:8%; animation-delay:.3s"></span>
+        <span class="p">D:\archive\2019-backup</span>
+        <span class="badge">Unclassified</span>
+        <span class="size">2.1 GB</span>
+      </div>
+    </div>
+    <div class="panel-foot">
+      Hover any badge in the app and it tells you exactly how to reclaim that folder — or why you shouldn't.
+    </div>
+  </div>
+
+  <section>
+    <p class="section-label">How it decides</p>
+    <div class="features">
+      <div class="feature">
+        <div class="rule"></div>
+        <h3>46 rules for the usual suspects</h3>
+        <p>
+          Docker and WSL virtual disks that never shrink. <code>node_modules</code>. Shader caches.
+          Windows.old. npm, pip, cargo and Gradle caches. Crash dumps. Forgotten iPhone backups.
+          Each one comes with the safe way to reclaim it.
+        </p>
+      </div>
+      <div class="feature">
+        <div class="rule"></div>
+        <h3>It knows who owns what</h3>
+        <p>
+          Folders are matched against your installed-apps registry and Microsoft Store packages,
+          so a mystery folder shows up as <em>Installed app · Blender</em> rather than a shrug.
+          What's left as unclassified genuinely is.
+        </p>
+      </div>
+      <div class="feature">
+        <div class="rule"></div>
+        <h3>Windows stays off limits</h3>
+        <p>
+          System folders can't be moved or deleted from here at all — the app points you at Storage
+          Sense and Disk Cleanup instead. Nothing is ever removed without you clicking it.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="section-label">Instead of deleting</p>
+    <div class="callout">
+      <div>
+        <h2>Move it to another drive. Nothing notices.</h2>
+        <p>
+          One click copies a folder to a roomier drive and leaves an NTFS junction behind, so every
+          app that referenced the old path keeps working exactly as before. The original is kept
+          until the copy and the link are both verified — if anything fails, it rolls straight back.
+        </p>
+      </div>
+      <div class="link-demo">
+        <span class="lbl">Before</span>
+        <span>C:\...\Local\Docker\wsl<br><span style="color:var(--ink-3)">24.8 GB on your system drive</span></span>
+        <span class="lbl">After</span>
+        <span><span class="arrow">↳</span> D:\Docker\wsl<br><span style="color:var(--ink-3)">C:\ path still works · 24.8 GB freed</span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="download">
+    <p class="section-label">Get it</p>
+    <h2>Free up your drive this afternoon</h2>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest">Download the installer</a>
+      <a class="btn btn-ghost" href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest">Portable version</a>
+    </div>
+    <p class="warn">
+      <strong>Heads up:</strong> Windows will show a blue “unknown publisher” warning — these builds
+      aren't code-signed yet. Click <strong>More info → Run anyway</strong>. Every release is built in
+      public by GitHub Actions straight from the repo and ships with SHA-256 checksums you can verify.
+    </p>
+  </section>
+
+  <section>
+    <div class="coffee">
+      <p>
+        <strong>Got a few gigabytes back?</strong> Cleanup Assist is free and always will be.
+        If it saved you an afternoon of squinting at folder sizes, you can buy me a coffee.
+      </p>
+      <a class="btn btn-primary" href="https://buymeacoffee.com/richard_gaskin">Buy me a coffee</a>
+    </div>
+  </section>
+
+  <footer>
+    <span>Built by <a href="https://github.com/RGaskinLtd">Richard Gaskin</a></span>
+    <a href="https://github.com/RGaskinLtd/cleanup-assist">GitHub</a>
+    <a href="https://github.com/RGaskinLtd/cleanup-assist/releases">Releases</a>
+    <span class="spacer">PolyForm Internal Use 1.0.0</span>
+  </footer>
+</div>
+</body>
+</html>
