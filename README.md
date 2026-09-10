@@ -98,10 +98,19 @@ crates/scanner-core/     The engine (pure Rust, no UI dependency)
   rules/                 The reclaimable-space rules database (JSON)
 src-tauri/               Thin Tauri 2 shell (commands + events)
 src/                     React UI
+site/                    Landing page (static, deployed separately)
 ```
 
 `cargo test -p scanner-core` runs the test suite, including end-to-end
 move-and-junction tests against real temp directories.
+
+### Landing page
+
+`site/` is a self-contained static page. [vercel.json](vercel.json) points Vercel
+at it and turns off the build step — without that, Vercel would spot the Vite
+config in `package.json` and deploy the app's UI instead. Import the repo at
+[vercel.com/new](https://vercel.com/new) and take the defaults; every push to
+`main` redeploys.
 
 ## Roadmap
 
