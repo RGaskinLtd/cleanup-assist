@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 2160px;
+    height: 2160px;
+    overflow: hidden;
+  }
+  .canvas {
+    width: 2160px;
+    height: 2160px;
+    background: #14161a;
+    display: grid;
+    place-items: center;
+  }
+  /* Full bleed, mark inset - the Store may round the corners itself,
+     so nothing important goes near the edge. */
+  svg { width: 1420px; height: 1420px; display: block; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <g transform="rotate(-90 120 120)">
+      <!-- r=80 => circumference 502.65. Segments match the app icon:
+           reclaim 140deg, app 90deg, unknown 60deg, os 70deg. -->
+      <circle cx="120" cy="120" r="80" fill="none" stroke="#34d399"
+              stroke-width="56" stroke-dasharray="195.47 307.18" stroke-dashoffset="0"/>
+      <circle cx="120" cy="120" r="80" fill="none" stroke="#60a5fa"
+              stroke-width="56" stroke-dasharray="125.66 376.99" stroke-dashoffset="-195.47"/>
+      <circle cx="120" cy="120" r="80" fill="none" stroke="#a78bfa"
+              stroke-width="56" stroke-dasharray="83.78 418.88" stroke-dashoffset="-321.13"/>
+      <circle cx="120" cy="120" r="80" fill="none" stroke="#6b7280"
+              stroke-width="56" stroke-dasharray="97.74 404.91" stroke-dashoffset="-404.91"/>
+    </g>
+  </svg>
+</div>
+</body>
+</html>

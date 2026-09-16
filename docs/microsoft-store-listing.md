@@ -217,6 +217,20 @@ progress bar.
 
 ---
 
+## Store artwork
+
+| Asset | File | Size |
+| --- | --- | --- |
+| Store logo (1:1) | `store-assets/store-logo-2160x2160.png` | 2160×2160 |
+| Poster art (2:3) | `store-assets/poster-art-1440x2160.png` | 1440×2160 |
+
+Both are generated from HTML sources in `store-assets/src/`, rendered headlessly
+at exact pixel dimensions — edit the source and re-render rather than retouching
+the PNGs. The logo is deliberately icon-only and inset from the edges, since the
+Store may apply its own corner masking.
+
+---
+
 ## Before you submit — open items
 
 1. **Code signing.** Store submissions of traditional desktop installers are

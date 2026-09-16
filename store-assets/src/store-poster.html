@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  html, body { margin: 0; padding: 0; width: 1440px; height: 2160px; overflow: hidden; }
+
+  .canvas {
+    width: 1440px;
+    height: 2160px;
+    background:
+      radial-gradient(1100px 900px at 78% 6%, rgba(52, 211, 153, .10), transparent 62%),
+      radial-gradient(900px 800px at 8% 96%, rgba(96, 165, 250, .09), transparent 60%),
+      #101318;
+    display: flex;
+    flex-direction: column;
+    padding: 132px 112px;
+    box-sizing: border-box;
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    color: #e9ecf1;
+  }
+
+  /* ---- brand ---- */
+  .brand { display: flex; align-items: center; gap: 30px; }
+  .brand svg { width: 86px; height: 86px; display: block; }
+  .brand .name {
+    font-family: Archivo, system-ui, sans-serif;
+    font-weight: 700;
+    font-size: 54px;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---- headline ---- */
+  .headline {
+    margin-top: 178px;
+    font-family: Archivo, system-ui, sans-serif;
+    font-weight: 800;
+    font-size: 122px;
+    line-height: 1.02;
+    letter-spacing: -0.032em;
+  }
+  .headline .quiet { color: #7d8794; display: block; }
+  .headline .safe { color: #34d399; }
+
+  .sub {
+    margin-top: 52px;
+    font-size: 40px;
+    line-height: 1.45;
+    color: #9ba5b3;
+    max-width: 21ch;
+  }
+
+  /* ---- proof panel ---- */
+  .panel {
+    margin-top: auto;
+    background: #181c23;
+    border: 1px solid #2b313a;
+    border-radius: 26px;
+    overflow: hidden;
+  }
+  .row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    padding: 30px 34px;
+    border-top: 1px solid #232830;
+    font-size: 29px;
+  }
+  .row:first-child { border-top: none; }
+  .fill { position: absolute; inset: 0 auto 0 0; background: currentColor; opacity: .10; }
+  .p {
+    font-family: "IBM Plex Mono", monospace;
+    color: #e9ecf1;
+    z-index: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+  }
+  .badge {
+    z-index: 1;
+    font-size: 24px;
+    font-weight: 600;
+    padding: 7px 20px;
+    border-radius: 999px;
+    border: 2px solid currentColor;
+    white-space: nowrap;
+  }
+  .size {
+    z-index: 1;
+    color: #e9ecf1;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    min-width: 172px;
+    text-align: right;
+  }
+  .t-reclaim { color: #34d399; }
+  .t-app     { color: #60a5fa; }
+  .t-user    { color: #e879f9; }
+  .t-os      { color: #8b95a3; }
+
+  /* ---- footer ---- */
+  .footer {
+    margin-top: 64px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 27px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: #6d7885;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #3a424d; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="brand">
+    <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+      <g transform="rotate(-90 120 120)">
+        <circle cx="120" cy="120" r="80" fill="none" stroke="#34d399"
+                stroke-width="56" stroke-dasharray="195.47 307.18" stroke-dashoffset="0"/>
+        <circle cx="120" cy="120" r="80" fill="none" stroke="#60a5fa"
+                stroke-width="56" stroke-dasharray="125.66 376.99" stroke-dashoffset="-195.47"/>
+        <circle cx="120" cy="120" r="80" fill="none" stroke="#a78bfa"
+                stroke-width="56" stroke-dasharray="83.78 418.88" stroke-dashoffset="-321.13"/>
+        <circle cx="120" cy="120" r="80" fill="none" stroke="#6b7280"
+                stroke-width="56" stroke-dasharray="97.74 404.91" stroke-dashoffset="-404.91"/>
+      </g>
+    </svg>
+    <span class="name">Cleanup Assist</span>
+  </div>
+
+  <div class="headline">
+    <span class="quiet">Every disk tool shows what's big.</span>
+    This one shows what's <span class="safe">safe</span>.
+  </div>
+
+  <p class="sub">
+    Every large folder gets a verdict, so you can free space without breaking anything.
+  </p>
+
+  <div class="panel">
+    <div class="row t-reclaim">
+      <span class="fill" style="width:100%"></span>
+      <span class="p">\AppData\Local\Docker\wsl</span>
+      <span class="badge">Reclaimable</span>
+      <span class="size">24.8 GB</span>
+    </div>
+    <div class="row t-user">
+      <span class="fill" style="width:50%"></span>
+      <span class="p">\Users\richard\Pictures</span>
+      <span class="badge">Your files</span>
+      <span class="size">12.4 GB</span>
+    </div>
+    <div class="row t-reclaim">
+      <span class="fill" style="width:37%"></span>
+      <span class="p">C:\Windows.old</span>
+      <span class="badge">Reclaimable</span>
+      <span class="size">9.1 GB</span>
+    </div>
+    <div class="row t-app">
+      <span class="fill" style="width:19%"></span>
+      <span class="p">\Blender Foundation\Blender</span>
+      <span class="badge">Installed app</span>
+      <span class="size">4.6 GB</span>
+    </div>
+    <div class="row t-os">
+      <span class="fill" style="width:16%"></span>
+      <span class="p">C:\Windows\System32</span>
+      <span class="badge">OS</span>
+      <span class="size">3.9 GB</span>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Windows 11</span><span class="dot"></span>
+    <span>No telemetry</span><span class="dot"></span>
+    <span>Free</span>
+  </div>
+
+</div>
+</body>
+</html>
