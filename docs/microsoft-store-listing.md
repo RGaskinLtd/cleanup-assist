@@ -156,7 +156,7 @@ clean up drive
 ## What's new in this version [1,500]
 
 ```
-Cleanup Assist 0.2.2
+Cleanup Assist 0.2.3
 
 • Safety badges now identify the application that owns a folder, using the Windows uninstall registry and Microsoft Store package data.
 • The reclaimable rules database has grown to 46 rules, covering Docker and WSL virtual disks, developer caches, shader caches, crash dumps, browser caches and device backups.
