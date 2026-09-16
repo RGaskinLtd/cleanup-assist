@@ -171,12 +171,59 @@ Cleanup Assist 0.2.2
 
 ## Additional system requirements [200 per line]
 
+Partner Center splits these into *Minimum* and *Recommended* hardware columns.
+Paste one line per requirement.
+
+### Minimum
+
 ```
-Windows 11, 64-bit (x64) Intel or AMD processor
+Windows 11 (any edition), 64-bit
 ```
 ```
-Administrator rights optional; needed only to scan folders your account cannot normally read
+64-bit x64 processor, 1 GHz or faster, 2 or more cores
 ```
+```
+4 GB RAM
+```
+```
+60 MB free disk space for installation
+```
+```
+1280 x 720 display
+```
+```
+Microsoft Edge WebView2 Runtime (included with Windows 11)
+```
+
+### Recommended
+
+```
+Windows 11 22H2 or later, 64-bit
+```
+```
+64-bit x64 processor with 4 or more cores — scanning runs in parallel
+```
+```
+8 GB RAM — a full drive scan of roughly a million files peaks near 500 MB
+```
+```
+Solid-state drive — scan speed is limited by how fast the drive returns file metadata
+```
+```
+Administrator rights, to scan folders a standard account cannot read
+```
+
+### Measured on the development machine
+
+SATA SSD, 12 logical cores, Windows 11:
+
+| Scanned | Files | Folders | Time | Peak RAM |
+| --- | ---: | ---: | ---: | ---: |
+| `C:\Program Files` | 38,124 | 3,491 | 5.0 s | 18 MB |
+| A full user profile | 777,914 | 137,210 | 114 s | 293 MB |
+
+Memory tracks the number of folders, not the bytes on disk. Scans on a mechanical
+hard drive take considerably longer; the app stays responsive throughout either way.
 
 ---
 
@@ -228,6 +275,39 @@ Both are generated from HTML sources in `store-assets/src/`, rendered headlessly
 at exact pixel dimensions — edit the source and re-render rather than retouching
 the PNGs. The logo is deliberately icon-only and inset from the edges, since the
 Store may apply its own corner masking.
+
+---
+
+## Notes for certification
+
+Seen only by Microsoft's certification testers, never by customers. Keep it
+concise and focused on how to exercise the app.
+
+```
+No account, licence key, trial code or network connection is required. The app is free, with no in-app purchases, no subscriptions and no advertising.
+
+TESTING IN TWO MINUTES
+1. Launch the app. Click "Browse..." and pick any folder holding a few hundred megabytes (Downloads or Documents is ideal), or type a path into the box. Click Scan.
+2. Progress appears immediately: live counts of files, folders and bytes as they are found, plus the folder currently being read. Results then list the largest folders, each with a coloured safety badge.
+3. Click any badge chip above the results to filter to that category, and again to clear it. Hovering a badge explains what that verdict means and how to reclaim the folder.
+
+WHY THE APP READS WHAT IT READS
+- File and folder metadata (names, paths, sizes, timestamps) for the location you choose to scan. File contents are never opened or read.
+- The HKLM and HKCU uninstall registry keys, plus the WindowsApps and AppData\Packages folders. These are read only to name which installed application owns a folder, so results can say "Installed app - Blender" instead of showing a bare path. Nothing is written to the registry.
+
+The application makes no network connections of any kind - no telemetry, no analytics, no crash reporting, no update check. There is no server component, so nothing external needs to be available to test it.
+
+TESTING THE MOVE FEATURE (optional, needs two drives)
+"Move..." copies a folder to another drive and leaves an NTFS junction at the original path, so software referencing the old location keeps working. To try it safely: create a small folder containing a few files on C:, scan its parent folder, then move that folder to a second drive. Afterwards the original path still lists the files, and "dir" on its parent shows the entry as <JUNCTION>. The original is retained until the copy and the junction are both verified, and any failure rolls back automatically.
+
+EXPECTED BEHAVIOUR THAT MAY LOOK LIKE A FAULT
+- Scanning a whole drive can take several minutes on a large or mechanical disk. The live counters keep updating throughout; the app is not frozen.
+- A "skipped" figure in the results summary is normal. Those are folders the current account lacks permission to read. Running as administrator reduces it. Scans never abort because of them.
+- Folders under C:\Windows are labelled "OS" and deliberately cannot be moved or deleted from within the app; it points to Storage Sense and Disk Cleanup instead.
+- The app requires no elevation for its core features. Administrator rights only widen what it can see.
+
+Questions during certification: https://github.com/RGaskinLtd/cleanup-assist/issues
+```
 
 ---
 
