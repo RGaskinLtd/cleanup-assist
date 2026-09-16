@@ -278,6 +278,56 @@ Store may apply its own corner masking.
 
 ---
 
+## Installer parameters
+
+Partner Center asks for the switches that make the package install without any
+user interaction. Which value you paste depends on which installer you submit.
+
+### If submitting the NSIS installer (`*-setup.exe`) — recommended
+
+```
+/S
+```
+
+Verified end to end on `Cleanup Assist_x64-setup.exe`: `/S` installs with no UI
+and exits with code 0. The switch is **case-sensitive — uppercase `S`**;
+lowercase `/s` is ignored and the installer opens its window instead.
+
+Optional extras, not needed for Store submission:
+
+| Switch | Effect |
+| --- | --- |
+| `/D=<path>` | Install directory. Must be the **last** argument and **unquoted**, even when the path contains spaces. |
+| `/S /D=<path>` | Both together — the order shown is required. |
+
+Uninstall is silent with the same switch: `"<install dir>\uninstall.exe" /S`
+removes every file and the registry entry, exit code 0.
+
+### If submitting the MSI
+
+```
+/quiet /norestart
+```
+
+Partner Center invokes `msiexec /i` itself, so supply only the switches above.
+`/qn` is equivalent to `/quiet`. Silent uninstall is `msiexec /x <product> /quiet`.
+
+### Install scope differs between the two
+
+| | NSIS `-setup.exe` | MSI |
+| --- | --- | --- |
+| Scope | Per-user | Per-machine (`ALLUSERS=1`) |
+| Elevation | **Not required** | **Required** |
+| Registers under | `HKCU\...\Uninstall\Cleanup Assist` | `HKLM` |
+| Install directory property | `/D=` | `INSTALLDIR` |
+
+The NSIS installer is the better submission: it installs silently for the current
+user with no UAC prompt, which is what Store-managed installation expects. The MSI
+needs elevation, so a silent install will fail outright in a non-elevated context
+rather than prompting.
+
+---
+
 ## Notes for certification
 
 Seen only by Microsoft's certification testers, never by customers. Keep it

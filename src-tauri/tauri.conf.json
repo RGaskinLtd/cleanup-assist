@@ -26,6 +26,9 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "Richard Gaskin",
+    "copyright": "© 2026 Richard Gaskin",
+    "shortDescription": "Find what's eating your disk — and whether it's safe to reclaim",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
