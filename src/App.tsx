@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { ask, message, open } from "@tauri-apps/plugin-dialog";
+import { Analytics } from "@vercel/analytics/react";
 import "./App.css";
 
 type Tier =
@@ -428,6 +429,7 @@ function App() {
       {!result && !scanning && !error && (
         <p className="status">Pick a drive or folder and hit Scan.</p>
       )}
+      <Analytics />
     </main>
   );
 }
