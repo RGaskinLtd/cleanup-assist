@@ -1,17 +1,17 @@
 {
   "_comment": "Names the release whose installers the site serves. Updated automatically by .github/workflows/release.yml; the resulting push triggers a Vercel rebuild, which downloads these assets into site/assets.",
-  "version": "0.2.3",
-  "tag": "v0.2.3",
-  "released": "2026-09-17",
+  "version": "0.2.4",
+  "tag": "v0.2.4",
+  "released": "2026-09-19",
   "_names": "GitHub replaces spaces with dots when it stores release assets, so these differ from the built filenames.",
   "assets": {
-    "setup": "Cleanup.Assist_0.2.3_x64-setup.exe",
-    "msi": "Cleanup.Assist_0.2.3_x64_en-US.msi",
+    "setup": "Cleanup.Assist_0.2.4_x64-setup.exe",
+    "msi": "Cleanup.Assist_0.2.4_x64_en-US.msi",
     "portable": "cleanup-assist.exe"
   },
   "sha256": {
-    "setup": "a3385c8e2d6f15047cbe199372cfbb886b464332d4715970a6a4226e64f0da66",
-    "msi": "05e28e406d207a116fa6c143dcb1caa678f0404588645438744695626ead6851",
-    "portable": "2ca0ded8f837af2c8c32847557bd1bca75972e9ef17dca80190290f14b75fd32"
+    "setup": "a0fe86f351566dab3e2efbd06daf65e511b68dac2ca57984ffdd6fa7127c1593",
+    "msi": "399e2d861df7528dd454cb4b7dbabf72e46507c4886f0b4ed3f72e3978f99a9d",
+    "portable": "e211278bad486c50a6bc9b97fb26aa7bd8d5f0844834b19689a827c1d5ed84b0"
   }
 }
