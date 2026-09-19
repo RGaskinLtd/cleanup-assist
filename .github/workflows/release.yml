@@ -53,6 +53,32 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.ref_name }} "target/release/cleanup-assist.exe" --clobber
 
+      # MSIX for the Microsoft Store. Store-submitted MSIX packages are re-signed
+      # by Microsoft after certification, so this is deliberately left unsigned -
+      # no certificate is needed, and users get no SmartScreen warning.
+      #
+      # Set the MSIX_IDENTITY_NAME / MSIX_PUBLISHER / MSIX_PUBLISHER_DISPLAY_NAME
+      # repository variables to Partner Center's values (Product > Product
+      # identity). Without them the package builds with a placeholder identity,
+      # which is fine for testing but rejected at upload.
+      - name: Build MSIX package
+        shell: pwsh
+        env:
+          MSIX_IDENTITY_NAME: ${{ vars.MSIX_IDENTITY_NAME }}
+          MSIX_PUBLISHER: ${{ vars.MSIX_PUBLISHER }}
+          MSIX_PUBLISHER_DISPLAY_NAME: ${{ vars.MSIX_PUBLISHER_DISPLAY_NAME }}
+        run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
+          ./packaging/msix/build-msix.ps1 -Version $version
+
+      - name: Attach MSIX
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $msix = Get-ChildItem "target/release/bundle/msix/*.msix" | Select-Object -First 1
+          gh release upload ${{ github.ref_name }} $msix.FullName --clobber
+
       # The builds are unsigned, so publish checksums people can verify against.
       - name: Publish checksums
         env:
@@ -63,6 +89,7 @@ jobs:
           $files = @(
             Get-ChildItem "target/release/bundle/nsis/*-setup.exe"
             Get-ChildItem "target/release/bundle/msi/*.msi"
+            Get-ChildItem "target/release/bundle/msix/*.msix"
             Get-ChildItem "target/release/cleanup-assist.exe"
           )
           $lines = $files | ForEach-Object {

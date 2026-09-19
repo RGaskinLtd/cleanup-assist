@@ -278,7 +278,45 @@ Store may apply its own corner masking.
 
 ---
 
-## Package download URL
+## Which package to submit — MSIX
+
+**Submit the MSIX.** Microsoft re-signs MSIX packages after certification, so no
+code-signing certificate is needed and users never see a SmartScreen warning.
+Submitting the EXE or MSI instead would require buying a certificate that chains
+to a CA in the Microsoft Trusted Root Program (self-signed is rejected, and the
+Store does not re-sign installers) — £100–250/year for something the MSIX path
+gives away free.
+
+Every release attaches `CleanupAssist_<version>_x64.msix`, built by
+[packaging/msix/build-msix.ps1](../packaging/msix/build-msix.ps1). Upload that
+file to Partner Center directly; no download URL is involved.
+
+### Before the first submission — set the package identity
+
+Partner Center assigns identity values when you reserve the app name, under
+**Product → Product identity**. The MSIX must carry them exactly or upload is
+rejected. Set these as GitHub **repository variables** (Settings → Secrets and
+variables → Actions → Variables) and the release workflow picks them up:
+
+| Repository variable | Partner Center field |
+| --- | --- |
+| `MSIX_IDENTITY_NAME` | Package/Identity/Name |
+| `MSIX_PUBLISHER` | Package/Identity/Publisher (the `CN=…` string) |
+| `MSIX_PUBLISHER_DISPLAY_NAME` | Package/Properties/PublisherDisplayName |
+
+Until they are set, the package builds with a placeholder identity and the build
+log warns loudly. That build is fine for testing the pipeline, but Partner Center
+will reject it.
+
+The package declares the `runFullTrust` restricted capability, which is the
+standard, routinely-approved declaration for a packaged Win32 desktop app. It is
+what lets the scanner keep normal file system and registry access instead of
+running sandboxed. Expect to justify it briefly in the submission if asked: the
+app is a disk analyzer and cannot do its job without reading the file system.
+
+---
+
+## Package download URL (only if submitting EXE/MSI instead)
 
 The Store needs a URL that returns the installer itself — a redirect will not do,
 which rules out `github.com/.../releases/latest/download/...` (that is a 302 to
@@ -389,16 +427,20 @@ Questions during certification: https://github.com/RGaskinLtd/cleanup-assist/iss
 
 ## Before you submit — open items
 
-1. **Code signing.** Store submissions of traditional desktop installers are
-   expected to be signed by a trusted certificate. The current builds are
-   unsigned, so resolve this first — Azure Trusted Signing is the cheapest route.
-2. **Packaging.** The Store accepts either an MSIX package or a traditional
-   EXE/MSI installer. Confirm which path you want; Tauri produces NSIS and MSI
-   today, and MSIX needs extra tooling.
-3. **Privacy policy must be live.** The URL is a required field and has to
+1. **Reserve the app name, then set the three MSIX identity variables** (see
+   *Which package to submit* above). Until that is done every MSIX carries a
+   placeholder identity and cannot be uploaded.
+2. **Privacy policy must be live.** The URL is a required field and has to
    resolve before certification, so deploy `site/` first.
-4. **Developer account.** Partner Center registration carries a one-off fee, and
+3. **Developer account.** Partner Center registration carries a one-off fee, and
    an individual account differs from a company account in what it can publish.
+4. **Test the MSIX on a real machine.** The package installs to
+   `C:\Program Files\WindowsApps`, which changes where the app runs from. Confirm
+   a full `C:\` scan, the safety badges, and a folder move all behave the same as
+   the plain executable before submitting.
+
+~~Code signing.~~ Resolved by submitting MSIX — Microsoft re-signs it, so no
+certificate is required.
 
 Verify current Store certification policy in Partner Center before submitting —
 these requirements change.

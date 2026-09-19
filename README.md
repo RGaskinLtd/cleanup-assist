@@ -121,6 +121,12 @@ redirect:
 /assets/CleanupAssist-Portable.exe   portable executable
 ```
 
+Each release also attaches an **MSIX package** for the Microsoft Store, built by
+[packaging/msix/build-msix.ps1](packaging/msix/build-msix.ps1). It is intentionally
+unsigned: the Store re-signs MSIX packages after certification, so no code-signing
+certificate is needed. That also means it cannot be side-loaded without signing it
+yourself — use the NSIS installer for direct distribution.
+
 Those binaries are **not** in git. [site/assets/manifest.json](site/assets/manifest.json)
 names the current release, and Vercel's build step runs
 [scripts/fetch-release-assets.mjs](scripts/fetch-release-assets.mjs) to download

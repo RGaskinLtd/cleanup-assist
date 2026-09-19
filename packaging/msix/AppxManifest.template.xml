@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  MSIX manifest template for Cleanup Assist.
+
+  Tokens in {{BRACES}} are substituted by packaging/msix/build-msix.ps1.
+
+  IMPORTANT - before a real Store submission, the identity values must match
+  exactly what Partner Center assigns under Product > Product identity:
+    Identity/@Name              -> "Package/Identity/Name"        e.g. 12345RichardGaskin.CleanupAssist
+    Identity/@Publisher         -> "Package/Identity/Publisher"   e.g. CN=ABCD1234-5678-...
+    Properties/PublisherDisplayName -> "Package/Properties/PublisherDisplayName"
+  A mismatch is rejected at upload. Pass them to the build script, or set the
+  MSIX_IDENTITY_NAME / MSIX_PUBLISHER / MSIX_PUBLISHER_DISPLAY_NAME repository
+  variables so the release workflow picks them up.
+
+  runFullTrust is a restricted capability (note: the capability is runFullTrust,
+  while the entry point is Windows.FullTrustApplication - easy to confuse). It is
+  the normal, routinely-approved declaration for a packaged Win32 desktop app, and
+  it is what lets Cleanup Assist keep full file system and registry access rather
+  than running sandboxed.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap rescap">
+
+  <Identity
+    Name="{{IDENTITY_NAME}}"
+    Publisher="{{PUBLISHER}}"
+    Version="{{VERSION}}"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Cleanup Assist</DisplayName>
+    <PublisherDisplayName>{{PUBLISHER_DISPLAY_NAME}}</PublisherDisplayName>
+    <Description>Find what's eating your disk - and whether it's safe to reclaim.</Description>
+    <Logo>Assets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <!-- Windows 11 only, matching what the app itself targets. -->
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <Application Id="CleanupAssist"
+                 Executable="cleanup-assist.exe"
+                 EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Cleanup Assist"
+        Description="Find what's eating your disk - and whether it's safe to reclaim."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <!-- Square310x310Logo is omitted deliberately: specifying it would also
+             require a Wide310x150Logo, which Tauri's icon set does not include. -->
+        <uap:DefaultTile Square71x71Logo="Assets\Square71x71Logo.png" />
+      </uap:VisualElements>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+
+</Package>
