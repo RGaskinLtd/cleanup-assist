@@ -103,6 +103,8 @@ pub enum RelocateError {
     },
     #[error("this folder contains Cleanup Assist's own {0} — the app can't move the folder it is running from")]
     SourceContainsSelf(&'static str),
+    #[error("Windows manages Store app folders: uninstall this app from Settings > Apps rather than moving {0}")]
+    SourceIsStoreApp(String),
     #[error("files in this folder are in use — close programs using it (and any Explorer windows open on it), then try again. Windows reported: {0}")]
     FolderInUse(std::io::Error),
     #[error("could not set aside the original folder: {0}")]
@@ -143,6 +145,14 @@ pub fn relocate_dir_with_progress(
     }
     if let Some(what) = contains_self(src) {
         return Err(RelocateError::SourceContainsSelf(what));
+    }
+    // WindowsApps is owned by TrustedInstaller and managed by the OS. It
+    // classifies as an installed app rather than OS-critical (so scan results can
+    // name the owning Store app), which would otherwise let a move be attempted
+    // here — it fails on ACLs at best, and breaks the app at worst. This matters
+    // more once Cleanup Assist ships from the Store and lives there itself.
+    if is_store_managed(&crate::classify::normalize(&src.display().to_string())) {
+        return Err(RelocateError::SourceIsStoreApp(src.display().to_string()));
     }
     if !dest_parent.is_dir() {
         return Err(RelocateError::DestNotFound(dest_parent.display().to_string()));
@@ -224,6 +234,11 @@ pub fn relocate_dir_with_progress(
         report.backup_left_at = Some(backup.display().to_string());
     }
     Ok(report)
+}
+
+/// True for anything inside the Store's package directory, which Windows owns.
+fn is_store_managed(normalized: &str) -> bool {
+    crate::classify::starts_with_component(normalized, "c:/program files/windowsapps")
 }
 
 /// The process holds handles that make moving these folders impossible: the
@@ -481,6 +496,26 @@ mod tests {
         );
         assert!(exe_dir.is_dir());
         let _ = fs::remove_dir_all(&dest_parent);
+    }
+
+    #[test]
+    fn refuses_to_move_store_app_folders() {
+        // Windows owns WindowsApps; it classifies as an installed app so results
+        // can name the owning Store app, so relocate must refuse it explicitly.
+        let dest = temp_root("cca-reloc-store");
+        let src = Path::new(r"C:\Program Files\WindowsApps\Microsoft.WindowsTerminal_1.18_x64__8wekyb3d8bbwe");
+        if src.exists() {
+            let err = relocate_dir(src, &dest).unwrap_err();
+            assert!(
+                matches!(err, RelocateError::SourceIsStoreApp(_)),
+                "unexpected error: {err}"
+            );
+        }
+        assert!(is_store_managed("c:/program files/windowsapps/somepackage"));
+        assert!(!is_store_managed("c:/program files/blender"));
+        // Must not match a lookalike directory name.
+        assert!(!is_store_managed("c:/program files/windowsappsbackup"));
+        let _ = fs::remove_dir_all(&dest);
     }
 
     #[test]

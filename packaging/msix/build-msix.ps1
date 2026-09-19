@@ -9,9 +9,25 @@
 
   The resulting package is UNSIGNED, which is correct for Store submission:
   Microsoft re-signs MSIX packages after certification, so no certificate is
-  needed. An unsigned MSIX cannot be side-loaded for local testing - sign it with
-  a self-signed certificate and trust that certificate if you want to install it
-  yourself.
+  needed.
+
+  INSTALLING IT LOCALLY REQUIRES SIGNING. `Add-AppxPackage -AllowUnsigned` does
+  not help: Windows rejects unsigned packages that declare an executable
+  activation (0x80073D2B), which every full-trust desktop app does. To test on
+  your own machine, sign with a self-signed certificate whose subject matches the
+  manifest's Publisher exactly, and trust that certificate:
+
+    $pub  = "CN=00000000-0000-0000-0000-000000000000"   # must match the manifest
+    $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject $pub `
+              -CertStoreLocation Cert:\CurrentUser\My
+    # Trusting the certificate needs an elevated prompt:
+    Export-Certificate -Cert $cert -FilePath "$env:TEMP\ca-test.cer" | Out-Null
+    Import-Certificate -FilePath "$env:TEMP\ca-test.cer" `
+      -CertStoreLocation Cert:\LocalMachine\TrustedPeople            # admin
+    & signtool.exe sign /fd SHA256 /a /f ... <package.msix>
+    Add-AppxPackage -Path <package.msix>
+
+  Remove the certificate from TrustedPeople when finished.
 
 .PARAMETER Version
   Three-part app version, e.g. 0.2.4. Expanded to the four-part form MSIX requires.
