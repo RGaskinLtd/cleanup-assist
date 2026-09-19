@@ -342,6 +342,48 @@ the last good release rather than breaking.
 
 ---
 
+## Installer handling — EXE return codes
+
+Only fill this in if you submit the EXE rather than the MSIX.
+
+**Documentation URL**
+
+```
+https://<your-domain>/exit-codes
+```
+
+**Standard install scenarios** — enter a value only where one genuinely exists.
+Measured against `CleanupAssist-Setup.exe` by running each case:
+
+| Partner Center scenario | Value to enter | Why |
+| --- | --- | --- |
+| Installation successful | `0` | Verified: fresh install, reinstall over an existing copy, and install to an alternative directory all return 0 |
+| Installation cancelled by user | *leave blank* | NSIS returns 1 on user abort, but `/S` shows no UI, so it cannot occur during a Store install |
+| Application already exists | *leave blank* | Reinstalling succeeds and returns 0 — no distinct code |
+| Installation already in progress | *leave blank* | No distinct code |
+| Disk space is full | *leave blank* | No distinct code |
+| Reboot required | *leave blank* | Not applicable — the app never requires a restart |
+| Network failure | *leave blank* | No distinct code; the installer does not use the network |
+| Package rejected during installation | *leave blank* | No distinct code |
+
+**Do not invent values for the blank rows.** Partner Center uses these to decide
+what to tell a user when an install fails; a wrong mapping produces a confidently
+wrong error message. Leaving a scenario unmapped is the accurate answer.
+
+### The finding behind those blanks
+
+Testing showed the installer **returns 0 even when it does not install**. Pointing
+`/D=` at a nonexistent drive, or at a directory the user cannot write to, both
+exited 0 with nothing installed. So a 0 return proves the installer ran, not that
+it succeeded — verify by checking for
+`HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cleanup Assist`.
+
+This is stock Tauri NSIS behaviour, not a configuration mistake. Emitting real
+failure codes would require a custom NSIS template. It is another argument for
+submitting the MSIX, where none of this applies.
+
+---
+
 ## Installer parameters
 
 Partner Center asks for the switches that make the package install without any

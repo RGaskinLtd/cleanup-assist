@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Installer Exit Codes — Cleanup Assist</title>
+<meta name="description" content="Return codes emitted by the Cleanup Assist Windows installer, and what each one means.">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="legal.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <a class="brand" href="index.html"><span class="mark" aria-hidden="true"></span> Cleanup Assist</a>
+    <nav><a href="index.html">&larr; Back to site</a></nav>
+  </header>
+
+  <h1>Installer Exit Codes</h1>
+  <p class="updated">Last updated 19 September 2026</p>
+
+  <div class="summary">
+    <span class="label">Summary</span>
+    <p>
+      <strong><code>0</code> means the installer ran to completion.</strong> The
+      Cleanup Assist installer is built with NSIS and does not define custom
+      return codes, so it reports the standard NSIS set below and nothing more
+      granular.
+    </p>
+  </div>
+
+  <h2>Codes the installer returns</h2>
+
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th>Code</th><th>Meaning</th><th>Applies to silent install</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>0</code></td>
+          <td>Installation completed successfully.</td>
+          <td>Yes — verified for a first install, a repeat install over an
+            existing one, and installation to an alternative directory.</td>
+        </tr>
+        <tr>
+          <td><code>1</code></td>
+          <td>The user cancelled the installation. This is the NSIS default for a
+            user-initiated abort.</td>
+          <td>No — a silent install (<code>/S</code>) presents no interface, so
+            there is nothing for a user to cancel.</td>
+        </tr>
+        <tr>
+          <td><code>2</code></td>
+          <td>The installation was aborted by the install script.</td>
+          <td>Rare — the installer does not deliberately abort under any
+            supported condition.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Scenarios with no distinct code</h2>
+  <p>
+    The following conditions do <strong>not</strong> produce their own return
+    value. The installer reports <code>0</code>, and the outcome must be
+    determined by checking whether the application is present afterwards.
+  </p>
+  <ul>
+    <li><strong>Application already installed</strong> — reinstalling over an
+      existing copy succeeds and returns <code>0</code>.</li>
+    <li><strong>Destination unreachable</strong> — for example a drive letter
+      that does not exist. The installer returns <code>0</code> without
+      installing.</li>
+    <li><strong>Insufficient permissions for the target directory</strong> — the
+      installer returns <code>0</code> without installing.</li>
+    <li><strong>Disk full</strong>, <strong>network failure</strong>,
+      <strong>installation already in progress</strong>, and
+      <strong>blocked by device security policy</strong> — no dedicated code is
+      emitted.</li>
+    <li><strong>Reboot required</strong> — not applicable. Cleanup Assist never
+      requires a restart to complete installation.</li>
+  </ul>
+
+  <h2>Verifying an installation succeeded</h2>
+  <p>
+    Because a <code>0</code> return value alone does not prove the files were
+    written, confirm the installation by checking that the registry entry exists:
+  </p>
+  <ul>
+    <li>Key: <code>HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Cleanup Assist</code></li>
+    <li>The <code>InstallLocation</code> value gives the directory, and
+      <code>DisplayVersion</code> the installed version.</li>
+  </ul>
+  <p>
+    The installer is per-user and requires no elevation. Silent installation uses
+    the uppercase switch <code>/S</code>; a lowercase <code>/s</code> is ignored
+    and the interface is shown instead.
+  </p>
+
+  <h2>Uninstalling</h2>
+  <p>
+    <code>uninstall.exe /S</code> in the install directory removes the
+    application and its registry entry, returning <code>0</code>.
+  </p>
+
+  <footer>
+    <a href="index.html">Home</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Use</a>
+    <span class="spacer">&copy; 2026 Richard Gaskin</span>
+  </footer>
+
+</div>
+</body>
+</html>
