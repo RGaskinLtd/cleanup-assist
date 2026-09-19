@@ -577,7 +577,7 @@
       30&nbsp;GB folder wondering whether deleting it frees your drive or breaks your PC.
     </p>
     <div class="cta-row">
-      <a class="btn btn-primary" href="/assets/CleanupAssist-Setup.exe">Download for Windows 11</a>
+      <a class="btn btn-primary" href="/assets/CleanupAssist-Setup.exe" data-dl="setup">Download for Windows 11</a>
       <a class="btn btn-ghost" href="https://github.com/RGaskinLtd/cleanup-assist">Read the source</a>
     </div>
     <p class="fineprint">Free &middot; no account &middot; no telemetry &middot; nothing is ever deleted without you saying so</p>
@@ -687,18 +687,18 @@
     <p class="section-label">Get it</p>
     <h2>Free up your drive this afternoon</h2>
     <div class="dl-grid">
-      <a class="dl primary" href="/assets/CleanupAssist-Setup.exe">
+      <a class="dl primary" href="/assets/CleanupAssist-Setup.exe" data-dl="setup">
         <span class="dl-top">
           <span class="dl-name">Installer</span>
           <span class="dl-tag">Recommended</span>
         </span>
         <span class="dl-meta">.exe &middot; installs for your user, no administrator needed</span>
       </a>
-      <a class="dl" href="/assets/CleanupAssist.msi">
+      <a class="dl" href="/assets/CleanupAssist.msi" data-dl="msi">
         <span class="dl-top"><span class="dl-name">MSI package</span></span>
         <span class="dl-meta">.msi &middot; for scripted or managed deployment</span>
       </a>
-      <a class="dl" href="/assets/CleanupAssist-Portable.exe">
+      <a class="dl" href="/assets/CleanupAssist-Portable.exe" data-dl="portable">
         <span class="dl-top"><span class="dl-name">Portable</span></span>
         <span class="dl-meta">.exe &middot; run it without installing anything</span>
       </a>
@@ -740,6 +740,19 @@
       if (!m || !m.version) return;
       var el = document.getElementById("dl-version");
       if (el) el.textContent = "Version " + m.version + " \u00b7 Windows 11 \u00b7 64-bit";
+
+      // Point the buttons at the version-stamped copies, so a saved file is
+      // identifiable later. The href already in the markup is the stable path
+      // the Store uses, and stays as the fallback if this never runs.
+      var names = {
+        setup: "CleanupAssist-" + m.version + "-Setup.exe",
+        msi: "CleanupAssist-" + m.version + ".msi",
+        portable: "CleanupAssist-" + m.version + "-Portable.exe"
+      };
+      Array.prototype.forEach.call(document.querySelectorAll("[data-dl]"), function (a) {
+        var n = names[a.getAttribute("data-dl")];
+        if (n) a.setAttribute("href", "/assets/" + n);
+      });
     })
     .catch(function () {});
 </script>

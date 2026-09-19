@@ -329,7 +329,9 @@ GitHub's asset CDN). These paths are served directly by Vercel with a 200:
 | Portable exe | `https://<your-domain>/assets/CleanupAssist-Portable.exe` |
 
 The filenames carry no version number and never change, so the URL stays valid
-across releases. Use the `https://` form of your canonical domain — an
+across releases. Version-stamped copies (e.g. CleanupAssist-0.2.6-Setup.exe)
+sit alongside them for people downloading from the website; the Store must use
+the unversioned paths above. Use the `https://` form of your canonical domain — an
 `http://` or non-canonical host would itself redirect.
 
 How they stay current: each release, the workflow commits an updated
