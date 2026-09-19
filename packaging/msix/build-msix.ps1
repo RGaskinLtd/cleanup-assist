@@ -74,6 +74,25 @@ try {
   }
   $msixVersion = "$Version.0"
 
+  # --- identity: fail here with something readable, rather than letting makeappx
+  # reject it later with a raw schema-pattern error.
+  if ($IdentityName -notmatch '^[-.A-Za-z0-9]{3,50}$') {
+    throw @"
+Invalid MSIX identity name: '$IdentityName'
+It must be 3-50 characters of letters, digits, dots or hyphens - no spaces.
+This is Partner Center's 'Package/Identity/Name' (Product management > Product
+identity), which is NOT the display name you reserved for the listing.
+"@
+  }
+  if ($Publisher -notmatch '^(CN|L|O|OU|E|C|S|STREET|T|G|I|SN|DC|SERIALNUMBER|OID\.[0-9.]+)=') {
+    throw @"
+Invalid MSIX publisher: '$Publisher'
+It must be an X.500 distinguished name, so a bare GUID will not do - prefix it
+with 'CN=', e.g. CN=$Publisher
+Copy it verbatim from Partner Center's 'Package/Identity/Publisher'.
+"@
+  }
+
   if (-not (Test-Path $ExePath)) { throw "executable not found: $ExePath" }
   if (-not $OutFile) { $OutFile = "target/release/bundle/msix/CleanupAssist_${Version}_x64.msix" }
 
