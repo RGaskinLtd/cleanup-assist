@@ -63,7 +63,11 @@ if (-not $IdentityName)         { $IdentityName = "RichardGaskin.CleanupAssist" 
 if (-not $Publisher)            { $Publisher = "CN=00000000-0000-0000-0000-000000000000" }
 if (-not $PublisherDisplayName) { $PublisherDisplayName = "Richard Gaskin" }
 
-$usingPlaceholder = $Publisher -like "CN=00000000-*"
+# Either half being a placeholder makes the package unsubmittable, and they are
+# set independently - so check both, not just the publisher.
+$placeholderPublisher = $Publisher -like "CN=00000000-*"
+$placeholderIdentity = $IdentityName -eq "RichardGaskin.CleanupAssist"
+$usingPlaceholder = $placeholderPublisher -or $placeholderIdentity
 
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "../..")
 Push-Location $repoRoot
@@ -146,8 +150,9 @@ Copy it verbatim from Partner Center's 'Package/Identity/Publisher'.
   Write-Host "Built $OutFile ($size MB)"
 
   if ($usingPlaceholder) {
-    Write-Warning "Built with PLACEHOLDER identity. Partner Center will reject this package."
-    Write-Warning "Set MSIX_IDENTITY_NAME / MSIX_PUBLISHER / MSIX_PUBLISHER_DISPLAY_NAME first."
+    Write-Warning "Built with a PLACEHOLDER identity. Partner Center will reject this package."
+    if ($placeholderIdentity) { Write-Warning "  MSIX_IDENTITY_NAME is not set to Partner Center's Package/Identity/Name." }
+    if ($placeholderPublisher) { Write-Warning "  MSIX_PUBLISHER is not set to Partner Center's Package/Identity/Publisher." }
   }
 }
 finally {
