@@ -104,13 +104,30 @@ site/                    Landing page (static, deployed separately)
 `cargo test -p scanner-core` runs the test suite, including end-to-end
 move-and-junction tests against real temp directories.
 
-### Landing page
+### Landing page and downloads
 
-`site/` is a self-contained static page. [vercel.json](vercel.json) points Vercel
-at it and turns off the build step — without that, Vercel would spot the Vite
-config in `package.json` and deploy the app's UI instead. Import the repo at
-[vercel.com/new](https://vercel.com/new) and take the defaults; every push to
-`main` redeploys.
+`site/` is a static page deployed to Vercel. [vercel.json](vercel.json) points
+Vercel at it and overrides framework detection — without that, Vercel would spot
+the Vite config in `package.json` and deploy the app's UI instead. Import the repo
+at [vercel.com/new](https://vercel.com/new) and take the defaults.
+
+Installers are served from the site itself at stable, version-less paths, because
+the Microsoft Store requires a download URL that returns the file rather than a
+redirect:
+
+```
+/assets/CleanupAssist-Setup.exe      NSIS installer (per-user, no admin)
+/assets/CleanupAssist.msi            MSI (per-machine, needs elevation)
+/assets/CleanupAssist-Portable.exe   portable executable
+```
+
+Those binaries are **not** in git. [site/assets/manifest.json](site/assets/manifest.json)
+names the current release, and Vercel's build step runs
+[scripts/fetch-release-assets.mjs](scripts/fetch-release-assets.mjs) to download
+that release's assets, checking each against the manifest's SHA-256. The release
+workflow updates the manifest after publishing, and that push triggers the
+rebuild — so a new release reaches the site without committing ~16 MB of
+binaries per version.
 
 ## Roadmap
 

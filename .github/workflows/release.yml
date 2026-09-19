@@ -90,3 +90,56 @@ jobs:
           )
           $notes | Out-File -Encoding utf8 release-notes.md
           gh release edit $tag --notes-file release-notes.md
+
+      # Point the website at this release. Committing the manifest to main is
+      # what makes Vercel rebuild, and its build step then downloads these
+      # installers into site/assets so the download URLs serve the new version.
+      # The binaries themselves are never committed.
+      - name: Update site download manifest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = $tag -replace '^v', ''
+
+          # Ask GitHub for the stored asset names: it rewrites spaces as dots,
+          # so these differ from the filenames the build produced.
+          $names = gh release view $tag --json assets --jq '.assets[].name'
+          $setupName    = $names | Where-Object { $_ -like '*-setup.exe' }   | Select-Object -First 1
+          $msiName      = $names | Where-Object { $_ -like '*.msi' }         | Select-Object -First 1
+          $portableName = $names | Where-Object { $_ -eq 'cleanup-assist.exe' } | Select-Object -First 1
+          if (-not ($setupName -and $msiName -and $portableName)) {
+            throw "could not resolve all three asset names from release $tag"
+          }
+
+          function Get-Sha($path) { (Get-FileHash $path -Algorithm SHA256).Hash.ToLower() }
+          $setupSha    = Get-Sha (Get-ChildItem "target/release/bundle/nsis/*-setup.exe").FullName
+          $msiSha      = Get-Sha (Get-ChildItem "target/release/bundle/msi/*.msi").FullName
+          $portableSha = Get-Sha "target/release/cleanup-assist.exe"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout main
+
+          $manifest = [ordered]@{
+            _comment = "Names the release whose installers the site serves. Updated automatically by .github/workflows/release.yml; the resulting push triggers a Vercel rebuild, which downloads these assets into site/assets."
+            version  = $version
+            tag      = $tag
+            released = (Get-Date -Format 'yyyy-MM-dd')
+            _names   = "GitHub replaces spaces with dots when it stores release assets, so these differ from the built filenames."
+            assets   = [ordered]@{ setup = $setupName; msi = $msiName; portable = $portableName }
+            sha256   = [ordered]@{ setup = $setupSha;  msi = $msiSha;  portable = $portableSha }
+          }
+          New-Item -ItemType Directory -Force site/assets | Out-Null
+          $manifest | ConvertTo-Json -Depth 5 | Out-File -Encoding utf8 site/assets/manifest.json
+
+          git add site/assets/manifest.json
+          if (git status --porcelain site/assets/manifest.json) {
+            git commit -m "Point site downloads at $tag"
+            git push origin main
+            Write-Host "manifest updated to $tag"
+          } else {
+            Write-Host "manifest already current"
+          }

@@ -278,6 +278,32 @@ Store may apply its own corner masking.
 
 ---
 
+## Package download URL
+
+The Store needs a URL that returns the installer itself — a redirect will not do,
+which rules out `github.com/.../releases/latest/download/...` (that is a 302 to
+GitHub's asset CDN). These paths are served directly by Vercel with a 200:
+
+| Package | URL |
+| --- | --- |
+| **NSIS installer — submit this one** | `https://<your-domain>/assets/CleanupAssist-Setup.exe` |
+| MSI | `https://<your-domain>/assets/CleanupAssist.msi` |
+| Portable exe | `https://<your-domain>/assets/CleanupAssist-Portable.exe` |
+
+The filenames carry no version number and never change, so the URL stays valid
+across releases. Use the `https://` form of your canonical domain — an
+`http://` or non-canonical host would itself redirect.
+
+How they stay current: each release, the workflow commits an updated
+`site/assets/manifest.json`; that push makes Vercel rebuild, and its build step
+(`scripts/fetch-release-assets.mjs`) downloads that release's installers into
+`site/assets`, verifying each against the checksum in the manifest. The binaries
+are never committed to git. If a download or checksum check fails the build
+fails, and Vercel keeps the previous deployment live — so the URLs keep serving
+the last good release rather than breaking.
+
+---
+
 ## Installer parameters
 
 Partner Center asks for the switches that make the package install without any

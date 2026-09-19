@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "echo 'no dependencies needed for the landing page'",
-  "buildCommand": "echo 'static page, nothing to build'",
+  "buildCommand": "node scripts/fetch-release-assets.mjs",
   "outputDirectory": "site",
   "cleanUrls": true,
   "headers": [
@@ -17,6 +17,22 @@
       "source": "/favicon.png",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=604800, immutable" }
+      ]
+    },
+    {
+      "source": "/assets/(.*).exe",
+      "headers": [
+        { "key": "Content-Type", "value": "application/octet-stream" },
+        { "key": "Content-Disposition", "value": "attachment" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
+      ]
+    },
+    {
+      "source": "/assets/(.*).msi",
+      "headers": [
+        { "key": "Content-Type", "value": "application/x-msi" },
+        { "key": "Content-Disposition", "value": "attachment" },
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     }
   ]

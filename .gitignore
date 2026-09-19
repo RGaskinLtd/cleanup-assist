@@ -15,6 +15,12 @@ dist-ssr
 # Rust workspace build output
 /target
 
+# Release installers served by the site. Fetched at build time by
+# scripts/fetch-release-assets.mjs - never commit them, or every release adds
+# ~16 MB to git history permanently. manifest.json IS tracked; it drives the fetch.
+site/assets/*.exe
+site/assets/*.msi
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
