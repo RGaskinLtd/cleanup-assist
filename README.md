@@ -8,8 +8,14 @@
 
 *A Windows 11 disk analyzer that answers the question every other one leaves you with.*
 
-<a href="https://apps.microsoft.com/detail/XP8JHTCJ56WQ97"><img src="https://img.shields.io/badge/Microsoft%20Store-get%20it%20now-34d399?style=for-the-badge&logo=microsoftstore&logoColor=white" alt="Get it on the Microsoft Store" /></a>
-<a href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest"><img src="https://img.shields.io/github/v/release/RGaskinLtd/cleanup-assist?label=direct%20download&color=6b7280&style=for-the-badge" alt="Download the latest release" /></a>
+<a href="https://apps.microsoft.com/detail/XP8JHTCJ56WQ97">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://get.microsoft.com/images/en-us%20dark.svg" />
+    <img src="https://get.microsoft.com/images/en-us%20light.svg" alt="Get Cleanup Assist from the Microsoft Store" height="56" />
+  </picture>
+</a>
+
+<a href="https://github.com/RGaskinLtd/cleanup-assist/releases/latest"><img src="https://img.shields.io/github/v/release/RGaskinLtd/cleanup-assist?label=or%20download%20directly&color=6b7280&style=flat-square" alt="Download the latest release" /></a>
 
 <img src="public/screenshot.png" alt="Cleanup Assist scanning a Desktop folder, with every large directory badged as reclaimable or personal files" width="850" />
 
