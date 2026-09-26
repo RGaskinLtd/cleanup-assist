@@ -4,6 +4,11 @@ Copy-paste source for Partner Center → *Store listings*. Field names below mat
 Partner Center; the limit for each is noted in brackets. Character counts are
 current as of writing — re-check with `docs/check-store-limits.py` after edits.
 
+**Status:** live at
+[apps.microsoft.com/detail/XP8JHTCJ56WQ97](https://apps.microsoft.com/detail/XP8JHTCJ56WQ97),
+submitted as an EXE installer hosted at **https://www.cleanup-assist.com**.
+Publisher display name: *Solutions Development*.
+
 ---
 
 ## Product name [256]
@@ -241,7 +246,7 @@ Point this at the deployed Terms of Use page, or paste the contents of
 `site/terms.html` as plain text.
 
 ```
-https://<your-domain>/terms
+https://www.cleanup-assist.com/terms
 ```
 
 ---
@@ -250,8 +255,8 @@ https://<your-domain>/terms
 
 | Field | Value |
 | --- | --- |
-| Privacy policy URL (**required**) | `https://<your-domain>/privacy` |
-| Website | `https://<your-domain>` |
+| Privacy policy URL (**required**) | `https://www.cleanup-assist.com/privacy` |
+| Website | `https://www.cleanup-assist.com` |
 | Support contact info | `https://github.com/RGaskinLtd/cleanup-assist/issues` |
 
 ---
@@ -331,11 +336,12 @@ So submit a **version-stamped** URL, not an unversioned one:
 
 | Package | URL to submit |
 | --- | --- |
-| **NSIS installer — submit this one** | `https://<your-domain>/assets/CleanupAssist-0.2.6-Setup.exe` |
-| MSI | `https://<your-domain>/assets/CleanupAssist-0.2.6.msi` |
+| **NSIS installer — submit this one** | `https://www.cleanup-assist.com/assets/CleanupAssist-0.2.6-Setup.exe` |
+| MSI | `https://www.cleanup-assist.com/assets/CleanupAssist-0.2.6.msi` |
 
-Use the `https://` form of your canonical domain; an `http://` or non-canonical
-host would itself redirect.
+**Use the `www` host.** `https://www.cleanup-assist.com/...` returns 200 directly,
+while the apex `https://cleanup-assist.com/...` answers with a 308 redirect — which
+is exactly what the Store rejects. Verified against the live site.
 
 > **Do not submit `/assets/CleanupAssist-Setup.exe`.** That unversioned path is
 > overwritten on every release, which is precisely what the rule forbids — the
@@ -371,7 +377,7 @@ Only fill this in if you submit the EXE rather than the MSIX.
 **Documentation URL**
 
 ```
-https://<your-domain>/exit-codes
+https://www.cleanup-assist.com/exit-codes
 ```
 
 **Standard install scenarios** — enter a value only where one genuinely exists.
