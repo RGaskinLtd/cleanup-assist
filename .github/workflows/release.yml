@@ -150,6 +150,28 @@ jobs:
           git fetch origin main
           git checkout main
 
+          # Carry the outgoing release into the retained list. The Microsoft
+          # Store requires that the binary behind a submitted URL never changes,
+          # so a versioned installer has to stay reachable long after it stops
+          # being current - dropping it here would 404 a live Store listing.
+          $retained = @()
+          if (Test-Path site/assets/manifest.json) {
+            $existing = Get-Content site/assets/manifest.json -Raw | ConvertFrom-Json
+            if ($existing.version -and $existing.version -ne $version) {
+              $retained += [ordered]@{
+                version = $existing.version
+                tag     = $existing.tag
+                setup   = $existing.assets.setup
+                msi     = $existing.assets.msi
+              }
+            }
+            if ($existing.retained) {
+              foreach ($r in $existing.retained) {
+                $retained += [ordered]@{ version = $r.version; tag = $r.tag; setup = $r.setup; msi = $r.msi }
+              }
+            }
+          }
+
           $manifest = [ordered]@{
             _comment = "Names the release whose installers the site serves. Updated automatically by .github/workflows/release.yml; the resulting push triggers a Vercel rebuild, which downloads these assets into site/assets."
             version  = $version
@@ -158,6 +180,8 @@ jobs:
             _names   = "GitHub replaces spaces with dots when it stores release assets, so these differ from the built filenames."
             assets   = [ordered]@{ setup = $setupName; msi = $msiName; portable = $portableName }
             sha256   = [ordered]@{ setup = $setupSha;  msi = $msiSha;  portable = $portableSha }
+            _retained = "Earlier releases kept online because the Microsoft Store requires the binary behind a submitted URL never to change. Do not remove an entry while a Store submission points at it."
+            retained  = @($retained)
           }
           New-Item -ItemType Directory -Force site/assets | Out-Null
           $manifest | ConvertTo-Json -Depth 5 | Out-File -Encoding utf8 site/assets/manifest.json

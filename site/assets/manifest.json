@@ -13,5 +13,50 @@
     "setup": "7b62dcea49f150b76f5a142981a237325ccecd8a18345fd443ef0e2d548f46a3",
     "msi": "fc5b682a96ed3fe98dac70bb4c8a23614b8c0cc23bf5aad365f9f4e6aae37c3d",
     "portable": "98b34b3f5f520bddeb5169420bec2cb98603aa5b3a8dbffb4401d5eb4ccfaf3d"
-  }
+  },
+  "_retained": "Earlier releases kept online because the Microsoft Store requires the binary behind a submitted URL never to change. Do not remove an entry while a Store submission points at it.",
+  "retained": [
+    {
+      "version": "0.2.5",
+      "tag": "v0.2.5",
+      "setup": "Cleanup.Assist_0.2.5_x64-setup.exe",
+      "msi": "Cleanup.Assist_0.2.5_x64_en-US.msi"
+    },
+    {
+      "version": "0.2.4",
+      "tag": "v0.2.4",
+      "setup": "Cleanup.Assist_0.2.4_x64-setup.exe",
+      "msi": "Cleanup.Assist_0.2.4_x64_en-US.msi"
+    },
+    {
+      "version": "0.2.3",
+      "tag": "v0.2.3",
+      "setup": "Cleanup.Assist_0.2.3_x64-setup.exe",
+      "msi": "Cleanup.Assist_0.2.3_x64_en-US.msi"
+    },
+    {
+      "version": "0.2.2",
+      "tag": "v0.2.2",
+      "setup": "Cleanup.Assist_0.2.2_x64-setup.exe",
+      "msi": "Cleanup.Assist_0.2.2_x64_en-US.msi"
+    },
+    {
+      "version": "0.2.1",
+      "tag": "v0.2.1",
+      "setup": "Cleanup.Assist_0.2.1_x64-setup.exe",
+      "msi": "Cleanup.Assist_0.2.1_x64_en-US.msi"
+    },
+    {
+      "version": "0.2.0",
+      "tag": "v0.2.0",
+      "setup": "Cleanup.Assist_0.2.0_x64-setup.exe",
+      "msi": "Cleanup.Assist_0.2.0_x64_en-US.msi"
+    },
+    {
+      "version": "0.1.0",
+      "tag": "v0.1.0",
+      "setup": "Cleanup.Assist_0.1.0_x64-setup.exe",
+      "msi": "Cleanup.Assist_0.1.0_x64_en-US.msi"
+    }
+  ]
 }

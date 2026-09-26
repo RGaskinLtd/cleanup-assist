@@ -89,8 +89,40 @@ async function main() {
     await writeFile(join(ASSETS_DIR, stamped), bytes);
 
     const mb = (bytes.length / 1024 / 1024).toFixed(2);
-    console.log(`  ${localName.padEnd(28)} ${mb.padStart(6)} MB  ${expected ? "sha256 ok" : ""}`);
-    console.log(`  ${stamped.padEnd(28)} ${"(same)".padStart(6)}`);
+    console.log(`  ${localName.padEnd(32)} ${mb.padStart(6)} MB  ${expected ? "sha256 ok" : ""}`);
+    console.log(`  ${stamped.padEnd(32)} ${"(same)".padStart(6)}`);
+  }
+
+  // Previously released installers, kept online because the Microsoft Store
+  // requires that the binary behind a submitted URL never changes. A Store
+  // submission points at a versioned URL, so that exact file has to stay
+  // reachable for as long as the submission does - long after the release
+  // stops being current.
+  const retained = Array.isArray(manifest.retained) ? manifest.retained : [];
+  if (retained.length) {
+    console.log(`\nRetaining ${retained.length} earlier version(s) for Store URLs`);
+  }
+  for (const entry of retained) {
+    if (!entry || !entry.tag || !entry.version) continue;
+    for (const key of ["setup", "msi"]) {
+      const remoteName = entry[key];
+      if (!remoteName) continue;
+      const stamped = versionedName(key, entry.version);
+      const url =
+        `https://github.com/${REPO}/releases/download/${encodeURIComponent(entry.tag)}/` +
+        encodeURIComponent(remoteName);
+      const res = await fetch(url, { redirect: "follow" });
+      if (!res.ok) {
+        // A retained release that has been deleted upstream must not silently
+        // disappear from the site - that is exactly what breaks a live listing.
+        throw new Error(
+          `${res.status} fetching retained ${entry.tag} asset ${remoteName}\n` +
+            `  Remove it from manifest.retained only if no Store submission points at it.`
+        );
+      }
+      await writeFile(join(ASSETS_DIR, stamped), Buffer.from(await res.arrayBuffer()));
+      console.log(`  ${stamped.padEnd(32)} ${entry.tag}`);
+    }
   }
 
   console.log("Done.");

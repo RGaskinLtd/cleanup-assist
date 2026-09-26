@@ -318,29 +318,49 @@ app is a disk analyzer and cannot do its job without reading the file system.
 
 ## Package download URL (only if submitting EXE/MSI instead)
 
-The Store needs a URL that returns the installer itself — a redirect will not do,
-which rules out `github.com/.../releases/latest/download/...` (that is a 302 to
-GitHub's asset CDN). These paths are served directly by Vercel with a 200:
+Two rules govern this, and they pull in opposite directions from what you might
+expect:
 
-| Package | URL |
+1. The URL must return the installer itself. A redirect will not do, which rules
+   out `github.com/.../releases/latest/download/...` (a 302 to GitHub's CDN).
+2. **The URL must be versioned, and the binary behind it must never change after
+   submission.** Microsoft is explicit: *"You must submit a versioned download
+   URL... The binary associated with that URL must not change after submission."*
+
+So submit a **version-stamped** URL, not an unversioned one:
+
+| Package | URL to submit |
 | --- | --- |
-| **NSIS installer — submit this one** | `https://<your-domain>/assets/CleanupAssist-Setup.exe` |
-| MSI | `https://<your-domain>/assets/CleanupAssist.msi` |
-| Portable exe | `https://<your-domain>/assets/CleanupAssist-Portable.exe` |
+| **NSIS installer — submit this one** | `https://<your-domain>/assets/CleanupAssist-0.2.6-Setup.exe` |
+| MSI | `https://<your-domain>/assets/CleanupAssist-0.2.6.msi` |
 
-The filenames carry no version number and never change, so the URL stays valid
-across releases. Version-stamped copies (e.g. CleanupAssist-0.2.6-Setup.exe)
-sit alongside them for people downloading from the website; the Store must use
-the unversioned paths above. Use the `https://` form of your canonical domain — an
-`http://` or non-canonical host would itself redirect.
+Use the `https://` form of your canonical domain; an `http://` or non-canonical
+host would itself redirect.
 
-How they stay current: each release, the workflow commits an updated
-`site/assets/manifest.json`; that push makes Vercel rebuild, and its build step
-(`scripts/fetch-release-assets.mjs`) downloads that release's installers into
-`site/assets`, verifying each against the checksum in the manifest. The binaries
-are never committed to git. If a download or checksum check fails the build
-fails, and Vercel keeps the previous deployment live — so the URLs keep serving
-the last good release rather than breaking.
+> **Do not submit `/assets/CleanupAssist-Setup.exe`.** That unversioned path is
+> overwritten on every release, which is precisely what the rule forbids — the
+> binary users install would stop matching the one that was certified.
+
+### Publishing an update
+
+Because the submitted URL is frozen to one binary, a new version needs a **new
+submission pointing at the new versioned URL** — replacing the file in place is
+not permitted. Microsoft puts the hosting obligation on you: *"You are
+responsible for maintaining and updating the download URL."*
+
+That means **old versioned URLs must stay reachable** for as long as a submission
+references them. `site/assets/manifest.json` carries a `retained` list of earlier
+releases, and the build re-downloads each one's installer so its URL keeps
+resolving. Every release from 0.1.0 onward is currently retained. Never remove an
+entry while a Store submission points at it.
+
+How the current release stays current: each release, the workflow commits an
+updated manifest; that push makes Vercel rebuild, and its build step
+(`scripts/fetch-release-assets.mjs`) downloads that release's installers plus
+every retained one into `site/assets`, verifying the current ones against their
+checksums. The binaries are never committed to git. If a download or checksum
+check fails the build fails, and Vercel keeps the previous deployment live — so
+the URLs keep serving the last good release rather than breaking.
 
 ---
 
